@@ -39,5 +39,7 @@ public struct DGElasticPullToRefreshConstants {
     public static var MinOffsetToPull: CGFloat = 95.0
     public static var LoadingContentInset: CGFloat = 50.0
     public static var LoadingViewSize: CGFloat = 30.0
+    public static var SpringDamping: CGFloat = 0.43
+    public static var LineWidth: CGFloat = 2.0
 	
 }
