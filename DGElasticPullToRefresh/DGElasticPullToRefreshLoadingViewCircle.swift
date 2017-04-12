@@ -67,7 +67,7 @@ open class DGElasticPullToRefreshLoadingViewCircle: DGElasticPullToRefreshLoadin
         
         shapeLayer.lineWidth = DGElasticPullToRefreshConstants.LineWidth
         shapeLayer.fillColor = UIColor.clear.cgColor
-        shapeLayer.strokeColor = tintColor.cgColor
+        shapeLayer.strokeColor = UIColor.white.cgColor
         shapeLayer.actions = ["strokeEnd" : NSNull(), "transform" : NSNull()]
         shapeLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         layer.addSublayer(shapeLayer)
