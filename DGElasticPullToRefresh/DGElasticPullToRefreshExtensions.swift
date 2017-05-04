@@ -112,6 +112,18 @@ public extension UIScrollView {
         pullToRefreshView.observing = true
     }
     
+    func dg_stopScrollingAnimation() {
+        if let superview = self.superview, let index = superview.subviews.index(where: { $0 == self }) as Int! {
+            let tempConstraints = superview.constraints
+            removeFromSuperview()
+            superview.insertSubview(self, at: index)
+            for constraint in tempConstraints {
+                guard !superview.constraints.contains(constraint) else { continue }
+                superview.addConstraint(constraint)
+            }
+        }
+    }
+    
     public func dg_removePullToRefresh() {
         pullToRefreshView?.disassociateDisplayLink()
         pullToRefreshView?.observing = false
@@ -127,6 +139,7 @@ public extension UIScrollView {
     }
     
     public func dg_stopLoading() {
+        dg_stopScrollingAnimation()
         pullToRefreshView?.stopLoading()
     }
 }
