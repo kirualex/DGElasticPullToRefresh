@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import UIKit
-import AudioToolbox
 
 // MARK: -
 // MARK: (CGFloat) Extension
@@ -89,7 +88,8 @@ open class DGElasticPullToRefreshLoadingViewCircle: DGElasticPullToRefreshLoadin
         
         if progress > 1.0 {
             if(!isPulled) {
-                AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.error)
             }
             isPulled = true
             let degrees = ((progress - 1.0) * 200.0)
