@@ -88,8 +88,10 @@ open class DGElasticPullToRefreshLoadingViewCircle: DGElasticPullToRefreshLoadin
         
         if progress > 1.0 {
             if(!isPulled) {
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.error)
+                if #available(iOS 10.0, *) {
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.success)
+                }
             }
             isPulled = true
             let degrees = ((progress - 1.0) * 200.0)
