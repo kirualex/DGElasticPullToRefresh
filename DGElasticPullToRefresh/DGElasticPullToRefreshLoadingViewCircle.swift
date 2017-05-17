@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 import UIKit
+import AudioToolbox
 
 // MARK: -
 // MARK: (CGFloat) Extension
@@ -86,6 +87,7 @@ open class DGElasticPullToRefreshLoadingViewCircle: DGElasticPullToRefreshLoadin
         shapeLayer.strokeEnd = min(0.9 * progress, 0.9)
         
         if progress > 1.0 {
+            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
             let degrees = ((progress - 1.0) * 200.0)
             shapeLayer.transform = CATransform3DRotate(identityTransform, degrees.toRadians(), 0.0, 0.0, 1.0)
         } else {
