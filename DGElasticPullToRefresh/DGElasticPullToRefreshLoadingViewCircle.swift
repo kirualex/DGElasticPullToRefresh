@@ -51,6 +51,7 @@ open class DGElasticPullToRefreshLoadingViewCircle: DGElasticPullToRefreshLoadin
     // MARK: Vars
     
     fileprivate let kRotationAnimation = "kRotationAnimation"
+    fileprivate var isPulled = false
     
     fileprivate let shapeLayer = CAShapeLayer()
     fileprivate lazy var identityTransform: CATransform3D = {
@@ -87,10 +88,14 @@ open class DGElasticPullToRefreshLoadingViewCircle: DGElasticPullToRefreshLoadin
         shapeLayer.strokeEnd = min(0.9 * progress, 0.9)
         
         if progress > 1.0 {
-            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+            if(!isPulled) {
+                AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+            }
+            isPulled = true
             let degrees = ((progress - 1.0) * 200.0)
             shapeLayer.transform = CATransform3DRotate(identityTransform, degrees.toRadians(), 0.0, 0.0, 1.0)
         } else {
+            isPulled = false
             shapeLayer.transform = identityTransform
         }
     }
