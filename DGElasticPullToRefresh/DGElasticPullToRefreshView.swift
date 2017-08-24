@@ -310,7 +310,6 @@ open class DGElasticPullToRefreshView: UIView {
         guard let scrollView = scrollView() else { return }
         if (!self.observing) { return }
         
-        
         resetScrollViewContentInset(shouldAddObserverWhenFinished: false, animated: false, completion: nil)
         
         let centerY = DGElasticPullToRefreshConstants.LoadingContentInset
@@ -363,12 +362,12 @@ open class DGElasticPullToRefreshView: UIView {
         
         if state == .animatingBounce {
             guard let scrollView = scrollView() else { return }
+            self.center = scrollView.center
             
             scrollView.contentInset.top = bounceAnimationHelperView.dg_center(isAnimating()).y
             scrollView.contentOffset.y = -scrollView.contentInset.top
             
             height = scrollView.contentInset.top - originalContentInsetTop
-            
             frame = CGRect(x: 0.0, y: -height - 1.0, width: width, height: height)
         } else if state == .animatingToStopped {
             height = actualContentOffsetY()
@@ -384,7 +383,7 @@ open class DGElasticPullToRefreshView: UIView {
     // MARK: Layout
     
     fileprivate func layoutLoadingView() {
-        let width = bounds.width
+        let width = self.superview?.bounds.width ?? 0.0
         let height: CGFloat = bounds.height
         
         let loadingViewSize: CGFloat = DGElasticPullToRefreshConstants.LoadingViewSize
@@ -392,7 +391,7 @@ open class DGElasticPullToRefreshView: UIView {
         let originY: CGFloat = max(min((height - loadingViewSize) / 2.0, minOriginY), 0.0)
         
         loadingView?.frame = CGRect(x: (width - loadingViewSize) / 2.0, y: originY, width: loadingViewSize, height: loadingViewSize)
-        loadingView?.maskLayer.frame = convert(shapeLayer.frame, to: loadingView)
+        //        loadingView?.maskLayer.frame = convert(shapeLayer.frame, to: loadingView)
         loadingView?.maskLayer.path = shapeLayer.path
     }
     
