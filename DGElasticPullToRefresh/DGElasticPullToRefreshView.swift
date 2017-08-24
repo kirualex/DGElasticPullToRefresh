@@ -1,34 +1,27 @@
 /*
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Danil Gontovnik
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
+ The MIT License (MIT)
+ Copyright (c) 2015 Danil Gontovnik
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
 import UIKit
 
 // MARK: -
 // MARK: DGElasticPullToRefreshState
-
 public
 enum DGElasticPullToRefreshState: Int {
     case stopped
@@ -44,7 +37,6 @@ enum DGElasticPullToRefreshState: Int {
 
 // MARK: -
 // MARK: DGElasticPullToRefreshView
-
 open class DGElasticPullToRefreshView: UIView {
     
     // MARK: -
@@ -58,6 +50,10 @@ open class DGElasticPullToRefreshView: UIView {
             _state = newValue
             
             if previousValue == .dragging && newValue == .animatingBounce {
+                loadingView?.startAnimating()
+                animateBounce()
+            } else if previousValue == .stopped && newValue == .animatingBounce {
+                loadingView?.setPullProgress(1.0)
                 loadingView?.startAnimating()
                 animateBounce()
             } else if newValue == .loading && actionHandler != nil {
@@ -143,28 +139,26 @@ open class DGElasticPullToRefreshView: UIView {
         
         NotificationCenter.default.addObserver(self, selector: #selector(DGElasticPullToRefreshView.applicationWillEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
     }
-
+    
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: -
-
     /**
-    Has to be called when the receiver is no longer required. Otherwise the main loop holds a reference to the receiver which in turn will prevent the receiver from being deallocated.
-    */
+     Has to be called when the receiver is no longer required. Otherwise the main loop holds a reference to the receiver which in turn will prevent the receiver from being deallocated.
+     */
     func disassociateDisplayLink() {
         displayLink?.invalidate()
     }
-
+    
     deinit {
         observing = false
         NotificationCenter.default.removeObserver(self)
     }
-
+    
     // MARK: -
     // MARK: Observer
-
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == DGElasticPullToRefreshConstants.KeyPaths.ContentOffset {
             if let newContentOffset = change?[NSKeyValueChangeKey.newKey], let scrollView = scrollView() {
@@ -189,7 +183,7 @@ open class DGElasticPullToRefreshView: UIView {
             }
         }
     }
-
+    
     // MARK: -
     // MARK: Notifications
     
@@ -212,6 +206,14 @@ open class DGElasticPullToRefreshView: UIView {
             return
         }
         state = .animatingToStopped
+    }
+    
+    func startLoading() {
+        if state != .stopped {
+            return
+        } else {
+            state = .animatingBounce
+        }
     }
     
     // MARK: Methods (Private)
@@ -318,7 +320,7 @@ open class DGElasticPullToRefreshView: UIView {
         startDisplayLink()
         scrollView.dg_removeObserver(self, forKeyPath: DGElasticPullToRefreshConstants.KeyPaths.ContentOffset)
         scrollView.dg_removeObserver(self, forKeyPath: DGElasticPullToRefreshConstants.KeyPaths.ContentInset)
-        UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: DGElasticPullToRefreshConstants.SpringDamping, initialSpringVelocity: 0.0, options: [], animations: { [weak self] in
+        UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 0.43, initialSpringVelocity: 0.0, options: [], animations: { [weak self] in
             self?.cControlPointView.center.y = centerY
             self?.l1ControlPointView.center.y = centerY
             self?.l2ControlPointView.center.y = centerY
@@ -334,7 +336,7 @@ open class DGElasticPullToRefreshView: UIView {
                     scrollView.isScrollEnabled = true
                 }
                 self?.state = .loading
-            })
+        })
         
         bounceAnimationHelperView.center = CGPoint(x: 0.0, y: originalContentInsetTop + currentHeight())
         UIView.animate(withDuration: duration * 0.4, animations: { [weak self] in
@@ -361,7 +363,7 @@ open class DGElasticPullToRefreshView: UIView {
         
         if state == .animatingBounce {
             guard let scrollView = scrollView() else { return }
-        
+            
             scrollView.contentInset.top = bounceAnimationHelperView.dg_center(isAnimating()).y
             scrollView.contentOffset.y = -scrollView.contentInset.top
             
@@ -371,7 +373,7 @@ open class DGElasticPullToRefreshView: UIView {
         } else if state == .animatingToStopped {
             height = actualContentOffsetY()
         }
-    
+        
         shapeLayer.frame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
         shapeLayer.path = currentPath()
         

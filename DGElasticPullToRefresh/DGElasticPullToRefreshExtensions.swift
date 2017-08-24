@@ -142,6 +142,10 @@ public extension UIScrollView {
         dg_stopScrollingAnimation()
         pullToRefreshView?.stopLoading()
     }
+    
+    public func dg_startLoading() {
+        pullToRefreshView?.startLoading()
+    }
 }
 
 // MARK: -

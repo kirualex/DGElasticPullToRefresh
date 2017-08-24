@@ -46,6 +46,12 @@ class ViewController: UIViewController {
     deinit {
         tableView.dg_removePullToRefresh()
     }
+ 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.tableView.dg_startLoading()
+    }
     
 }
 
