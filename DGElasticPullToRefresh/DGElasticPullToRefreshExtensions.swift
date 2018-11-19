@@ -113,7 +113,7 @@ public extension UIScrollView {
     }
     
     func dg_stopScrollingAnimation() {
-        if let superview = self.superview, let index = superview.subviews.index(where: { $0 == self }) as Int! {
+        if let superview = self.superview, let index = superview.subviews.index(where: { $0 == self }) {
             let tempConstraints = superview.constraints
             removeFromSuperview()
             superview.insertSubview(self, at: index)
@@ -174,8 +174,8 @@ public extension UIPanGestureRecognizer {
 // MARK: -
 // MARK: (UIGestureRecognizerState) Extension
 
-public extension UIGestureRecognizerState {
-    func dg_isAnyOf(_ values: [UIGestureRecognizerState]) -> Bool {
+public extension UIGestureRecognizer.State {
+    func dg_isAnyOf(_ values: [UIGestureRecognizer.State]) -> Bool {
         return values.contains(where: { $0 == self })
     }
 }
